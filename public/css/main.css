@@ -1,0 +1,22 @@
+*{
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+body{
+    background: linear-gradient(to left, #ADD8E6 0%, #144E75 100%);
+}
+h1,h2{
+    color:whitesmoke;
+}
+
+.problemSet{
+    background:hsl(195, 25%, 79%);
+    padding:2%;
+    margin:1%;
+    width:25%;
+    color:black;
+}
+
+.problemSet:hover{
+    background:hsla(195, 25%, 79%,.2);
+    color:white;
+}
