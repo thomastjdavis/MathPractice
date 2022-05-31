@@ -1,14 +1,38 @@
 function noZero(dims)
-    a = rand(-10:10:1,dims)
+    a = rand(-10:1:10,dims)
     if in(0,a)
         return noZero(dims)
     end
     return a
 end
-function randomFactorProblem()
-    ac = noZero(2)
+
+function factorProblems(n::Int64)
+    n<=1 && return randomFactorProblem()
+
+    problems = [randomFactorProblem(difficulty=2)]
+    index=2
+    while (index<=n)
+        v=randomFactorProblem(difficulty=2)
+        for j in 1:length(problems)
+            if problems[j][:prompt]== v[:prompt]
+                continue
+            end
+        end
+        push!(problems,v)
+        index = index+1
+    end
+    
+    problems
+end
+
+#=TO DO: write different difficulties:
+    difficulty=1 -> a and c are both 1, or one of b,d are zero
+    difficulty=2 -> a and c are b
+    =#
+function randomFactorProblem(;difficulty::Int64=1)
+    ac = (difficulty==1) ? ones(Int64,2) : noZero(2)
     bd = rand(-10:1:10,2)
-    v = [ac[1], ac[2], bd[1], bd[2]]
+    v = vcat(ac[1], bd[1], ac[2], bd[2])
     return multipliedQuadratic(v)
 end
 function multipliedQuadratic(v::Vector{Int64})
@@ -24,22 +48,34 @@ function multipliedQuadratic(a::Int64,b::Int64,c::Int64,d::Int64)
     c2 = -1*c2
     c3=-1*c3
    end
-   return ["$(ignoreOne(c1))x^2$(giveSignSymbol(c2))x$(giveSignSymbol(c3))","$(ignoreOne(a))x$(giveSignSymbol(b))","$(ignoreOne(c))x$(giveSignSymbol(d))"]
+   problem =  ["$(ignoreOne(c1))x^2$(giveSignSymbol(c2))$(giveSignSymbol(c3,showX=false))","$(ignoreOne(a))x$(giveSignSymbol(b,showX=false))","$(ignoreOne(c))x$(giveSignSymbol(d,showX=false))"]
+   Dict(:prompt=>problem[1],:factors=>[problem[2],problem[3]])
 end
 
-function giveSignSymbol(a)
-    if(sign(a)==1)
-        return "+$(a)"
+function giveSignSymbol(a;showX::Bool=true)
+    valueString=""
+    if (sign(a)==1)
+        valueString = "+$(a)"
+        if showX
+            valueString = valueString*"x"
+        end
     elseif (sign(a)==-1)
-        return "-$(abs(a))"
+            valueString = "-$(abs(a))"
+        if showX
+                valueString = valueString*"x"
+        end
     else
-        return ""
+        valueString = ""
     end
+    
+    valueString
 end
 
 function ignoreOne(a)
     if a==1
         return ""
+    elseif a==-1
+        return "-"
     else
         return "$(a)"
     end
